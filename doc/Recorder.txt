@@ -1,0 +1,7 @@
+1.pom文件
+2.定义flume拦截器
+本项目中自定义了两个拦截器，分别是：ETL拦截器、日志类型区分拦截器。
+（1）ETL拦截器LogETLInterceptor：主要用于，过滤时间戳不合法和Json数据不完整的日志
+（2）日志类型区分拦截器LogTypeInterceptor：主要用于，将启动日志和事件日志区分开来，方便发往Kafka的不同Topic。
+
+3.打包
