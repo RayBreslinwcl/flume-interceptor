@@ -5,3 +5,4 @@
 （2）日志类型区分拦截器LogTypeInterceptor：主要用于，将启动日志和事件日志区分开来，方便发往Kafka的不同Topic。
 
 3.打包
+maven->package
