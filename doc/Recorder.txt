@@ -13,3 +13,76 @@ maven->package
 （1）因为cdh集群，所以上传到即可
 /opt/cloudera/parcels/CDH-5.15.2-1.cdh5.15.2.p0.3/lib/flume-ng/lib
 （2）分配到cdh2和cdh3各有一个
+
+5.cdh配置flume-kafka
+flume收集数据传输至kafka
+（1）第一步：修改代理Agent Name为a1
+
+（2）第二步：配置写入如下
+a1.sources=r1
+a1.channels=c1 c2
+a1.sinks=k1 k2
+
+# configure source
+a1.sources.r1.type = TAILDIR
+a1.sources.r1.positionFile = /opt/module/flume/log_position.json
+a1.sources.r1.filegroups = f1
+a1.sources.r1.filegroups.f1 = /tmp/logs/*.log
+a1.sources.r1.fileHeader = true
+a1.sources.r1.channels = c1 c2
+
+#interceptor
+a1.sources.r1.interceptors = i1 i2
+a1.sources.r1.interceptors.i1.type = com.bd.flume.interceptor.LogETLInterceptor
+a1.sources.r1.interceptors.i2.type = com.bd.flume.interceptor.LogTypeInterceptor
+
+# selector
+a1.sources.r1.selector.type = multiplexing
+a1.sources.r1.selector.header = topic
+a1.sources.r1.selector.mapping.topic_start = c1
+a1.sources.r1.selector.mapping.topic_event = c2
+
+# configure channel
+a1.channels.c1.type = memory
+a1.channels.c1.capacity=10000
+a1.channels.c1.byteCapacityBufferPercentage=20
+
+a1.channels.c2.type = memory
+a1.channels.c2.capacity=10000
+a1.channels.c2.byteCapacityBufferPercentage=20
+
+# configure sink
+# start-sink
+a1.sinks.k1.type = org.apache.flume.sink.kafka.KafkaSink
+a1.sinks.k1.kafka.topic = topic_start
+a1.sinks.k1.kafka.bootstrap.servers = cdh1:9092,cdh2:9092,cdh3:9092
+a1.sinks.k1.kafka.flumeBatchSize = 2000
+a1.sinks.k1.kafka.producer.acks = 1
+a1.sinks.k1.channel = c1
+
+# event-sink
+a1.sinks.k2.type = org.apache.flume.sink.kafka.KafkaSink
+a1.sinks.k2.kafka.topic = topic_event
+a1.sinks.k2.kafka.bootstrap.servers = cdh1:9092,cdh2:9092,cdh3:9092
+a1.sinks.k2.kafka.flumeBatchSize = 2000
+a1.sinks.k2.kafka.producer.acks = 1
+a1.sinks.k2.channel = c2
+
+注意：com.atguigu.flume.interceptor.LogETLInterceptor和com.atguigu.flume.interceptor.LogTypeInterceptor是自定义的拦截器的全类名。需要根据用户自定义的拦截器做相应修改。
+
+（3）修改/opt/module/flume/log_position.json的读写权限
+[root@hadoop102 module]# mkdir -p /opt/module/flume
+[root@hadoop102 flume]# touch log_position.json
+[root@hadoop102 flume]# chmod 777 log_position.json
+[root@hadoop102 module]# xsync flume/
+
+【测试：】
+[root@cdh2 logs]# mkdir -p /opt/module/flume
+[root@cdh2 logs]# cd /opt/module/flume/
+[root@cdh2 flume]# touch log_position.json
+[root@cdh2 flume]# chmod 777 log_position.json
+[root@cdh2 flume]# cd ..
+[root@cdh2 module]# scp -r flume/ root@cdh3:/opt/module/
+log_position.json
+
+注意：Json文件的父目录一定要创建好，并改好权限
