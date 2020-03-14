@@ -6,3 +6,10 @@
 
 3.打包
 maven->package
+获得瘦包就可以，因为相关依赖在服务器flume的lib下都存在
+"..\bdutil\flume-interceptor\target\interceptor-1.0-SNAPSHOT.jar"
+
+4.部署
+（1）因为cdh集群，所以上传到即可
+/opt/cloudera/parcels/CDH-5.15.2-1.cdh5.15.2.p0.3/lib/flume-ng/lib
+（2）分配到cdh2和cdh3各有一个
