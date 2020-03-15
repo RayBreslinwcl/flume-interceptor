@@ -161,3 +161,15 @@ a1.sinks.k1.channel= c1
 
 a1.sources.r2.channels = c2
 a1.sinks.k2.channel= c2
+
+因为本地cdh环境，暂时不支持lzo
+[root@cdh3 softwares]# hadoop checknative
+20/03/15 16:45:09 INFO bzip2.Bzip2Factory: Successfully loaded & initialized native-bzip2 library system-native
+20/03/15 16:45:09 INFO zlib.ZlibFactory: Successfully loaded & initialized native-zlib library
+Native library checking:
+hadoop:  true /opt/cloudera/parcels/CDH-5.15.2-1.cdh5.15.2.p0.3/lib/hadoop/lib/native/libhadoop.so.1.0.0
+zlib:    true /lib64/libz.so.1
+snappy:  true /opt/cloudera/parcels/CDH-5.15.2-1.cdh5.15.2.p0.3/lib/hadoop/lib/native/libsnappy.so.1
+lz4:     true revision:10301
+bzip2:   true /lib64/libbz2.so.1
+openssl: true /lib64/libcrypto.so
